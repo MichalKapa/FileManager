@@ -20,13 +20,19 @@ class Controller:
 
 if __name__ == '__main__':
     app = Controller()
-    print(app.model.createDirectory(app.path, app.outputDirectory))
+    # print(app.model.createDirectory(app.path, app.outputDirectory))
 
-    app.model.createAllFolders(app.configurationPath, app.outputDirectoryPath)
+    # app.model.createAllFolders(app.configurationPath, app.outputDirectoryPath)
 
     # test files
     # app.model.createTestFiles(app.configurationPath, app.outputDirectoryPath)
 
     app.model.sortFiles(app.configurationPath, app.outputDirectoryPath)
+
+    # app.model.addFolder(app.configurationPath, "Secret files", "seCret", app.outputDirectoryPath)
+
+    # app.model.emptyAllDirectories(app.outputDirectoryPath)
+
+    # app.model.deleteAllEmptyDirectories(app.outputDirectoryPath)
 
     app.main()

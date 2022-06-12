@@ -90,6 +90,35 @@ class Model:
                 for extension in folder[1].split(";"):
                     if "." + extension in file:
                         self.moveToDirectory(outputDirectoryPath + "/" + file,
-                                                   outputDirectoryPath + "/" + folder[0] + "/" + file)
+                                             outputDirectoryPath + "/" + folder[0] + "/" + file)
                         fileSorted = True
                         break
+
+    def addFolder(self, configurationPath, folderName, phrase, outputPath):
+        f = open(configurationPath + '/nameFolders.csv', 'a')
+        writer = csv.writer(f)
+        row = [folderName, phrase]
+        writer.writerow(row)
+        f.close()
+        self.createNameFolders(configurationPath, outputPath)
+
+    def safeDeleteAllFolders(self):
+        for root, dirs, files in os.walk("."):
+            path = root.split(os.sep)
+            print((len(path) - 1) * '---', os.path.basename(root))
+            for file in files:
+                print(len(path) * '---', file)
+
+    def emptyAllDirectories(self, outputDirectoryPath):
+        for root, dirs, files in os.walk(outputDirectoryPath):
+            path = root
+            for file in files:
+                self.moveToDirectory(path + "/" + file, outputDirectoryPath + "/" + file)
+
+    def deleteAllEmptyDirectories(self, outputDirectoryPath):
+        for directory in os.listdir(outputDirectoryPath):
+            directoryPath = outputDirectoryPath + "/" + directory
+            if os.path.isdir(directoryPath):
+                if len(os.listdir(directoryPath)) == 0:
+                    os.rmdir(directoryPath)
+                    print("removing: " + directoryPath)
