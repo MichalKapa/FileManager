@@ -1,8 +1,10 @@
+Access files, ACCDA;ACCDB;ACCDE;ACCDT;ACCDR
 Applications,exe
 Codes,cpp;py;java;scala;ml
-Excel files,xls;xlsx;xlsm;xlsb;xltx
+Excel files,xls;xlsx;xlsm;xlsb;xltx;xlm;xlt;xlsb;xla
 Images,avif;bmp;ico;png;jpg;jpeg;gif;tiff;raw;svg;webp;img
 PDFs,pdf
+PowerPoint files,ppt;pot;pps;ppa;ppam;pptx;
 Scripts,asp;bat;html;js;sh;vbs;wsf;wsh
 Shortcuts,link;url;cda
 Soundtracks,mp3;aac;ogg;flac;alac;wav;aiff;dsd;pcm
@@ -11,3 +13,4 @@ Videos,asf;avi;mov;mp4;3gp
 Word files,doc;docx
 Compressed files,zip;7z;arj;deb;pkg;rar;tar;z
 Other files,
+Files to compress,

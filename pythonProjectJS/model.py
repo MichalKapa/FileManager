@@ -1,7 +1,10 @@
 import csv
 import os
+import shutil
+from win32com.client import Dispatch
 import random
 import time
+import zipfile
 
 
 class Model:
@@ -180,3 +183,57 @@ class Model:
             if file[2] < oldestFile[2]:
                 oldestFile = file
         print("oldest file: " + oldestFile[0] + oldestFile[1] + oldestFile[2])
+
+    def createShortcuts(self, outputDirectoryPath):
+        shortcutFolder = "Shortcuts"
+        absolutePath = os.path.abspath(outputDirectoryPath)
+        self.createDirectory(outputDirectoryPath, shortcutFolder)
+
+        for root, dirs, files in os.walk(absolutePath):
+            for file in files:
+                if ".lnk" not in file:
+                    shortcutPath = outputDirectoryPath + "/" + shortcutFolder + "/" + file + ".lnk"
+                    if not os.path.exists(shortcutPath):
+                        targetPath = os.path.join(root, file)
+
+                        shell = Dispatch('WScript.Shell')
+                        shortcut = shell.CreateShortCut(shortcutPath)
+                        shortcut.Targetpath = targetPath
+                        shortcut.IconLocation = targetPath
+                        shortcut.save()
+
+    def compressFile(self, outputDirectoryPath, path, file):
+
+            fileName = file.split(".")[0]
+            inputPath = path + file
+            output = outputDirectoryPath + "/Compressed files/" + fileName + ".zip"
+
+            zf = zipfile.ZipFile(output, mode="w")
+
+            try:
+                zf.write(inputPath, file, compress_type=zipfile.ZIP_DEFLATED)
+            except FileNotFoundError as e:
+                print(f' *** Exception occurred during zip process - {e}')
+            finally:
+                zf.close()
+
+    def compressPreparedFiles(self, outputDirectoryPath, configurationPath):
+
+        compressFolder = "Files to compress"
+
+        path = outputDirectoryPath + "/" + compressFolder + "/"
+
+        for file in os.listdir(path):
+            compressedOutputPath = outputDirectoryPath + "/Compressed files/" + file
+
+            if "." in file and file.split(".")[1] in self.getFileExtensionList(configurationPath, "Compressed files"):
+                self.moveToDirectory(path + file, compressedOutputPath)
+
+            else:
+                if os.path.isdir(path + file):
+                    shutil.make_archive(base_dir=file, root_dir=path, format='zip', base_name=compressedOutputPath)
+                    print(path + file)
+                    print(compressedOutputPath)
+
+                else:
+                    self.compressFile(outputDirectoryPath, path, file)

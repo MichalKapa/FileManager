@@ -40,8 +40,13 @@ if __name__ == '__main__':
 
     # print(app.model.searchTxtFiles(app.outputDirectoryPath, "created"))
 
-    print(app.model.getPhotos(app.configurationPath, app.outputDirectoryPath))
+    # app.model.createShortcuts(app.outputDirectoryPath)
 
-    app.model.findOldestFile(app.model.getPhotos(app.configurationPath, app.outputDirectoryPath))
+    app.model.compressPreparedFiles(app.outputDirectoryPath, app.configurationPath)
+
+
+    # print(app.model.getPhotos(app.configurationPath, app.outputDirectoryPath))
+
+    # app.model.findOldestFile(app.model.getPhotos(app.configurationPath, app.outputDirectoryPath))
 
     app.main()
