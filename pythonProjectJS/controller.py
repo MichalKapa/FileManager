@@ -1,4 +1,3 @@
-import random
 
 from model import Model
 from view import View
@@ -15,13 +14,13 @@ class Controller:
         self.configurationPath = "../configuration"
 
     def main(self):
-        # self.view.main()
+        self.view.main()
         pass
 
 
 if __name__ == '__main__':
     app = Controller()
-    # print(app.model.createDirectory(app.path, app.outputDirectory))
+    print(app.model.createDirectory(app.path, app.outputDirectory))
 
     # app.model.createAllFolders(app.configurationPath, app.outputDirectoryPath)
 
@@ -42,11 +41,10 @@ if __name__ == '__main__':
 
     # app.model.createShortcuts(app.outputDirectoryPath)
 
-    app.model.compressPreparedFiles(app.outputDirectoryPath, app.configurationPath)
+    # app.model.compressPreparedFiles(app.outputDirectoryPath, app.configurationPath)
 
+    # app.model.sortOldFiles(app.configurationPath, app.outputDirectoryPath, 2021)
 
-    # print(app.model.getPhotos(app.configurationPath, app.outputDirectoryPath))
-
-    # app.model.findOldestFile(app.model.getPhotos(app.configurationPath, app.outputDirectoryPath))
+    # print(app.model.searchTxtFiles(app.outputDirectoryPath, ""))
 
     app.main()
