@@ -12,10 +12,12 @@ class Model:
     def __init__(self):
         pass
 
-    def getFilesInDirectory(self, path):
+    @staticmethod
+    def getFilesInDirectory(path):
         return os.listdir(path)
 
-    def createDirectory(self, path, dirName):
+    @staticmethod
+    def createDirectory(path, dirName):
         dirPath = os.path.join(path, dirName)
         if not os.path.exists(dirPath):
             os.mkdir(dirPath)
@@ -23,13 +25,15 @@ class Model:
 
         return "Folder " + dirName + " already exists"
 
-    def moveToDirectory(self, src, dst):
+    @staticmethod
+    def moveToDirectory(src, dst):
         os.replace(src, dst)
 
         return "Moved to: " + dst
 
     # create test file
-    def createFile(self, path, fileName):
+    @staticmethod
+    def createFile(path, fileName):
         try:
             with open(path + fileName, 'w') as f:
                 f.write('Created new file: ' + fileName)
@@ -62,6 +66,8 @@ class Model:
                 self.createDirectory(outputPath, line[0])
 
     def sortFiles(self, configurationPath, outputDirectoryPath):
+        self.createFolders(configurationPath, outputDirectoryPath, 'extensionFolders.csv')
+
         folderList = []
         folderNameList = []
 
@@ -112,7 +118,8 @@ class Model:
             for file in files:
                 self.moveToDirectory(path + "/" + file, outputDirectoryPath + "/" + file)
 
-    def deleteAllEmptyDirectories(self, outputDirectoryPath):
+    @staticmethod
+    def deleteAllEmptyDirectories(outputDirectoryPath):
         for directory in os.listdir(outputDirectoryPath):
             directoryPath = outputDirectoryPath + "/" + directory
             if os.path.isdir(directoryPath):
@@ -120,7 +127,8 @@ class Model:
                     os.rmdir(directoryPath)
                     print("removing: " + directoryPath)
 
-    def calculateDirectorySize(self, outputDirectoryPath):
+    @staticmethod
+    def calculateDirectorySize(outputDirectoryPath):
         tuppleList = []
         for root, dirs, files in os.walk(outputDirectoryPath):
             path = root
@@ -133,8 +141,9 @@ class Model:
         #     print(tupple[0] + " " + str(tupple[1]))
         return tuppleList
 
-    def searchString(self, filePath, string):
-        with open(filePath, 'r') as file:
+    @staticmethod
+    def searchString(filePath, string):
+        with open(filePath, 'r', encoding="ISO-8859-1") as file:
             content = file.read()
             if string.lower() in content.lower():
                 return os.path.abspath(filePath)
@@ -142,14 +151,16 @@ class Model:
     def searchTxtFiles(self, outputDirectoryPath, string):
         fileList = []
         for root, dirs, files in os.walk(outputDirectoryPath):
-            for directory in dirs:
-                path = root + "/" + directory
-                for file in os.listdir(path):
-                    if ".txt" in file:
-                        fileList.append(self.searchString(path + "/" + file, string))
+            path = root
+            for file in files:
+                if ".txt" in file and not "lnk" in file:
+                    txtPath = self.searchString(path + "/" + file, string)
+                    if txtPath is not None:
+                        fileList.append(txtPath)
         return fileList
 
-    def getFileExtensionList(self, configurationPath, directoryName):
+    @staticmethod
+    def getFileExtensionList(configurationPath, directoryName):
         extensionList = []
         with open(configurationPath + "/" + "extensionFolders.csv") as fileObject:
             readerObject = csv.reader(fileObject, delimiter=",")
@@ -158,31 +169,6 @@ class Model:
                     extensionList = line[1].split(";")
                     break
         return extensionList
-
-    def getPhotos(self, configurationPath, outputDirectoryPath):
-        filePathDateList = []
-        imageExtensionList = self.getFileExtensionList(configurationPath, "Images")
-
-        for root, dirs, files in os.walk(outputDirectoryPath):
-            path = root
-            for file in files:
-                for extension in imageExtensionList:
-                    if "." + extension in file:
-                        # print(file + " " + path)
-                        date = time.ctime(os.path.getctime(path + "/" + file))
-                        filePathDateList.append((file, path, date))
-        return filePathDateList
-
-    def createPhotoAlbums(self, outputDirectoryPath):
-        pass
-    # WIP
-
-    def findOldestFile(self, files):
-        oldestFile = files[0]
-        for file in files:
-            if file[2] < oldestFile[2]:
-                oldestFile = file
-        print("oldest file: " + oldestFile[0] + oldestFile[1] + oldestFile[2])
 
     def createShortcuts(self, outputDirectoryPath):
         shortcutFolder = "Shortcuts"
@@ -202,20 +188,21 @@ class Model:
                         shortcut.IconLocation = targetPath
                         shortcut.save()
 
-    def compressFile(self, outputDirectoryPath, path, file):
+    @staticmethod
+    def compressFile(outputDirectoryPath, path, file):
 
-            fileName = file.split(".")[0]
-            inputPath = path + file
-            output = outputDirectoryPath + "/Compressed files/" + fileName + ".zip"
+        fileName = file.split(".")[0]
+        inputPath = path + file
+        output = outputDirectoryPath + "/Compressed files/" + fileName + ".zip"
 
-            zf = zipfile.ZipFile(output, mode="w")
+        zf = zipfile.ZipFile(output, mode="w")
 
-            try:
-                zf.write(inputPath, file, compress_type=zipfile.ZIP_DEFLATED)
-            except FileNotFoundError as e:
-                print(f' *** Exception occurred during zip process - {e}')
-            finally:
-                zf.close()
+        try:
+            zf.write(inputPath, file, compress_type=zipfile.ZIP_DEFLATED)
+        except FileNotFoundError as e:
+            print(f' *** Exception occurred during zip process - {e}')
+        finally:
+            zf.close()
 
     def compressPreparedFiles(self, outputDirectoryPath, configurationPath):
 
@@ -237,3 +224,30 @@ class Model:
 
                 else:
                     self.compressFile(outputDirectoryPath, path, file)
+
+    @staticmethod
+    def getAllFilesModificationDate(configurationPath, outputDirectoryPath):
+        filePathDateList = []
+        folderList = []
+
+        with open(configurationPath + "/" + "extensionFolders.csv") as fileObject:
+            readerObject = csv.reader(fileObject, delimiter=",")
+            for line in readerObject:
+                path = outputDirectoryPath + "/" + line[0]
+                folderList.append(line[0])
+                for file in os.listdir(path):
+                    date = time.ctime(os.path.getmtime(path + "/" + file))
+                    filePathDateList.append((file, path, date))
+            for file in os.listdir(outputDirectoryPath):
+                if file not in folderList:
+                    path = outputDirectoryPath + "/"
+                    date = time.ctime(os.path.getmtime(path + file))
+                    filePathDateList.append((file, path, date))
+        return filePathDateList
+
+    def sortOldFiles(self, configurationPath, outputDirectoryPath, mDate):
+        self.createDirectory(outputDirectoryPath, "Old files")
+        for filePathDate in self.getAllFilesModificationDate(configurationPath, outputDirectoryPath):
+            if int((filePathDate[2].split(" "))[-1]) <= mDate:
+                self.moveToDirectory(filePathDate[1] + filePathDate[0],
+                                     outputDirectoryPath + "/Old files/" + filePathDate[0])
