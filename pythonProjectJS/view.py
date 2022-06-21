@@ -248,7 +248,7 @@ class View(tk.Tk):
         iMoveLabel["font"] = ft
         iMoveLabel["fg"] = "#333333"
         iMoveLabel["justify"] = "center"
-        iMoveLabel["text"] = "[Move all]\n - Move all files last modified before or in\n given year to Old files folder."
+        iMoveLabel["text"] = "[Move old]\n - Move all files last modified before or in\n given year to Old files folder."
         iMoveLabel["relief"] = relief
         iMoveLabel.place(x=280, y=369, width=280, height=98)
 

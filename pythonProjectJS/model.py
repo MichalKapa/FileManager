@@ -63,7 +63,8 @@ class Model:
         with open(path + "/" + csvFile) as fileObject:
             readerObject = csv.reader(fileObject, delimiter=",")
             for line in readerObject:
-                self.createDirectory(outputPath, line[0])
+                if line:
+                    self.createDirectory(outputPath, line[0])
 
     def sortFiles(self, configurationPath, outputDirectoryPath):
         self.createFolders(configurationPath, outputDirectoryPath, 'extensionFolders.csv')
