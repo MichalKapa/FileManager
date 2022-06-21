@@ -115,8 +115,9 @@ class Model:
     def emptyAllDirectories(self, outputDirectoryPath):
         for root, dirs, files in os.walk(outputDirectoryPath):
             path = root
-            for file in files:
-                self.moveToDirectory(path + "/" + file, outputDirectoryPath + "/" + file)
+            if "FileManager" not in root:
+                for file in files:
+                    self.moveToDirectory(path + "/" + file, outputDirectoryPath + "/" + file)
 
     @staticmethod
     def deleteAllEmptyDirectories(outputDirectoryPath):
@@ -133,12 +134,11 @@ class Model:
         for root, dirs, files in os.walk(outputDirectoryPath):
             path = root
             for directory in dirs:
-                size = 0
-                for file in os.listdir(path + "/" + directory):
-                    size += os.path.getsize(path + "/" + directory + "/" + file)
-                tuppleList.append((directory, size))
-        # for tupple in tuppleList:
-        #     print(tupple[0] + " " + str(tupple[1]))
+                if "FileManager" not in root:
+                    size = 0
+                    for file in os.listdir(path + "/" + directory):
+                        size += os.path.getsize(path + "/" + directory + "/" + file)
+                    tuppleList.append((directory, size))
         return tuppleList
 
     @staticmethod
@@ -176,17 +176,18 @@ class Model:
         self.createDirectory(outputDirectoryPath, shortcutFolder)
 
         for root, dirs, files in os.walk(absolutePath):
-            for file in files:
-                if ".lnk" not in file:
-                    shortcutPath = outputDirectoryPath + "/" + shortcutFolder + "/" + file + ".lnk"
-                    if not os.path.exists(shortcutPath):
-                        targetPath = os.path.join(root, file)
+            if "FileManager" not in root:
+                for file in files:
+                    if ".lnk" not in file:
+                        shortcutPath = outputDirectoryPath + "/" + shortcutFolder + "/" + file + ".lnk"
+                        if not os.path.exists(shortcutPath):
+                            targetPath = os.path.join(root, file)
 
-                        shell = Dispatch('WScript.Shell')
-                        shortcut = shell.CreateShortCut(shortcutPath)
-                        shortcut.Targetpath = targetPath
-                        shortcut.IconLocation = targetPath
-                        shortcut.save()
+                            shell = Dispatch('WScript.Shell')
+                            shortcut = shell.CreateShortCut(shortcutPath)
+                            shortcut.Targetpath = targetPath
+                            shortcut.IconLocation = targetPath
+                            shortcut.save()
 
     @staticmethod
     def compressFile(outputDirectoryPath, path, file):
@@ -236,8 +237,9 @@ class Model:
                 path = outputDirectoryPath + "/" + line[0]
                 folderList.append(line[0])
                 for file in os.listdir(path):
-                    date = time.ctime(os.path.getmtime(path + "/" + file))
-                    filePathDateList.append((file, path, date))
+                    if "FileManager" not in os.path.abspath(path):
+                        date = time.ctime(os.path.getmtime(path + "/" + file))
+                        filePathDateList.append((file, path, date))
             for file in os.listdir(outputDirectoryPath):
                 if file not in folderList:
                     path = outputDirectoryPath + "/"

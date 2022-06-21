@@ -1,13 +1,19 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, END, RIGHT, Y, LEFT, BOTH, X
 import tkinter.font as tkFont
 from tkinter.tix import Tk
+import plotly.express as px
 
 
 class View(tk.Tk):
 
     def __init__(self, controller):
         super().__init__()
+        self.yearEntry = None
+        self.inputTextEntry = None
+        self.folderNameEntry = None
+        self.recognizedTextEntry = None
+
         self.controller = controller
 
         self.title("MKFileManager")
@@ -46,7 +52,7 @@ class View(tk.Tk):
         createButton["justify"] = "center"
         createButton["text"] = "Create folders"
         createButton.place(x=35, y=110, width=230, height=40)
-        # createButton["command"] = self.createButton
+        createButton["command"] = self.controller.createFoldersButton
 
         sortButton = tk.Button(self)
         sortButton["bg"] = buttonBackground
@@ -56,7 +62,7 @@ class View(tk.Tk):
         sortButton["justify"] = "center"
         sortButton["text"] = "Sort files"
         sortButton.place(x=295, y=110, width=230, height=40)
-        # sortButton["command"] = self.sortButton
+        sortButton["command"] = self.controller.sortFilesButton
 
         addFolderButton = tk.Button(self)
         addFolderButton["bg"] = buttonBackground
@@ -76,7 +82,7 @@ class View(tk.Tk):
         extractButton["justify"] = "center"
         extractButton["text"] = "Extract files"
         extractButton.place(x=295, y=190, width=230, height=40)
-        # extractButton["command"] = self.extractButton
+        extractButton["command"] = self.controller.extractFilesButton
 
         deleteButton = tk.Button(self)
         deleteButton["bg"] = buttonBackground
@@ -86,7 +92,7 @@ class View(tk.Tk):
         deleteButton["justify"] = "center"
         deleteButton["text"] = "Delete empty"
         deleteButton.place(x=35, y=270, width=230, height=40)
-        # deleteButton["command"] = self.deleteButton
+        deleteButton["command"] = self.controller.deleteEmptyButton
 
         searchButton = tk.Button(self)
         searchButton["bg"] = buttonBackground
@@ -106,7 +112,7 @@ class View(tk.Tk):
         shortcutsButton["justify"] = "center"
         shortcutsButton["text"] = "Create shortcuts"
         shortcutsButton.place(x=35, y=360, width=230, height=40)
-        # shortcutsButton["command"] = self.shortcutsButton
+        shortcutsButton["command"] = self.controller.createShortcutsButton
 
         moveButton = tk.Button(self)
         moveButton["bg"] = buttonBackground
@@ -126,7 +132,7 @@ class View(tk.Tk):
         compressButton["justify"] = "center"
         compressButton["text"] = "Compress files"
         compressButton.place(x=35, y=450, width=230, height=40)
-        # GButton_407["command"] = self.GButton_407_command
+        compressButton["command"] = self.controller.compressFilesButton
 
         calculateButton = tk.Button(self)
         calculateButton["bg"] = buttonBackground
@@ -136,7 +142,7 @@ class View(tk.Tk):
         calculateButton["justify"] = "center"
         calculateButton["text"] = "Calculate size"
         calculateButton.place(x=295, y=450, width=230, height=40)
-        # calculateButton["command"] = self.calculateButton
+        calculateButton["command"] = self.controller.calculateSizeButton
 
         instructionButton = tk.Button(self)
         instructionButton["bg"] = "#E0E0E0"
@@ -312,6 +318,8 @@ class View(tk.Tk):
         folderNameEntry["justify"] = "left"
         folderNameEntry.place(x=240, y=60, width=220, height=30)
 
+        self.folderNameEntry = folderNameEntry
+
 
         recognizedTextEntry = tk.Entry(addFolderWindow)
         recognizedTextEntry["borderwidth"] = "2px"
@@ -321,6 +329,8 @@ class View(tk.Tk):
         recognizedTextEntry["justify"] = "left"
         recognizedTextEntry.place(x=240, y=120, width=220, height=30)
 
+        self.recognizedTextEntry = recognizedTextEntry
+
         addButton = tk.Button(addFolderWindow)
         addButton["bg"] = "#f0f0f0"
         ft = tkFont.Font(family='Times', size=13)
@@ -329,7 +339,7 @@ class View(tk.Tk):
         addButton["justify"] = "center"
         addButton["text"] = "Add"
         addButton.place(x=220, y=180, width=127, height=31)
-        # addButton["command"] = self.addButton
+        addButton["command"] = self.controller.addFolderButton
 
     def displaySearchText(self):
         master = self.master
@@ -345,14 +355,14 @@ class View(tk.Tk):
         searchTextWindow.geometry(alignstr)
         searchTextWindow.resizable(width=False, height=False)
 
-        searchtextLabel = tk.Label(searchTextWindow)
+        searchTextLabel = tk.Label(searchTextWindow)
         ft = tkFont.Font(family='Times', size=23)
-        searchtextLabel["font"] = ft
-        searchtextLabel["fg"] = "#333333"
-        searchtextLabel["justify"] = "center"
-        searchtextLabel["text"] = "Search text"
-        searchtextLabel["relief"] = "flat"
-        searchtextLabel.place(x=0, y=0, width=560, height=40)
+        searchTextLabel["font"] = ft
+        searchTextLabel["fg"] = "#333333"
+        searchTextLabel["justify"] = "center"
+        searchTextLabel["text"] = "Search text"
+        searchTextLabel["relief"] = "flat"
+        searchTextLabel.place(x=0, y=0, width=560, height=40)
 
         inputTextLabel = tk.Label(searchTextWindow)
         ft = tkFont.Font(family='Times', size=16)
@@ -370,6 +380,8 @@ class View(tk.Tk):
         inputTextEntry["justify"] = "left"
         inputTextEntry.place(x=140, y=60, width=400, height=30)
 
+        self.inputTextEntry = inputTextEntry
+
         searchButton = tk.Button(searchTextWindow)
         searchButton["bg"] = "#f0f0f0"
         ft = tkFont.Font(family='Times', size=13)
@@ -378,7 +390,32 @@ class View(tk.Tk):
         searchButton["justify"] = "center"
         searchButton["text"] = "Search"
         searchButton.place(x=220, y=120, width=127, height=31)
-        # searchButton["command"] = self.searchButton
+        searchButton["command"] = self.controller.searchTextButton
+
+    def dislplaySearchTextResults(self, resultList):
+        master = self.master
+
+        searchResultsWindow = tk.Toplevel(master)
+
+        searchResultsWindow.title("undefined")
+        # setting window size
+        width = 650
+        height = 180
+        screenwidth = searchResultsWindow.winfo_screenwidth()
+        screenheight = searchResultsWindow.winfo_screenheight()
+        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        searchResultsWindow.geometry(alignstr)
+        searchResultsWindow.resizable(width=False, height=False)
+
+        scrollbar = tk.Scrollbar(searchResultsWindow)
+        scrollbar.pack(fill=Y, side=RIGHT)
+
+        mylist = tk.Listbox(searchResultsWindow, yscrollcommand=scrollbar.set, width=120)
+        for result in resultList:
+            mylist.insert(END, result)
+
+        mylist.pack(side=LEFT, fill=X)
+        scrollbar.config(command=mylist.yview)
 
     def dislpayMoveOld(self):
         master = self.master
@@ -394,43 +431,66 @@ class View(tk.Tk):
         moveOldWindow.geometry(alignstr)
         moveOldWindow.resizable(width=False, height=False)
 
-        GLabel_151 = tk.Label(moveOldWindow)
+        moveOldText = tk.Label(moveOldWindow)
         ft = tkFont.Font(family='Times', size=23)
-        GLabel_151["font"] = ft
-        GLabel_151["fg"] = "#333333"
-        GLabel_151["justify"] = "center"
-        GLabel_151["text"] = "Move old"
-        GLabel_151["relief"] = "flat"
-        GLabel_151.place(x=0, y=0, width=560, height=40)
+        moveOldText["font"] = ft
+        moveOldText["fg"] = "#333333"
+        moveOldText["justify"] = "center"
+        moveOldText["text"] = "Move old"
+        moveOldText["relief"] = "flat"
+        moveOldText.place(x=0, y=0, width=560, height=40)
 
-        GLabel_729 = tk.Label(moveOldWindow)
+        yearLabel = tk.Label(moveOldWindow)
         ft = tkFont.Font(family='Times', size=16)
-        GLabel_729["font"] = ft
-        GLabel_729["fg"] = "#333333"
-        GLabel_729["justify"] = "right"
-        GLabel_729["text"] = "Input max year:"
-        GLabel_729.place(x=165, y=60, width=130, height=30)
+        yearLabel["font"] = ft
+        yearLabel["fg"] = "#333333"
+        yearLabel["justify"] = "right"
+        yearLabel["text"] = "Input max year:"
+        yearLabel.place(x=165, y=60, width=130, height=30)
 
-        GLineEdit_976 = tk.Entry(moveOldWindow)
-        GLineEdit_976["borderwidth"] = "2px"
-        ft = tkFont.Font(family='Times', size=13)
-        GLineEdit_976["font"] = ft
-        GLineEdit_976["fg"] = "#333333"
-        GLineEdit_976["justify"] = "center"
-        GLineEdit_976.place(x=305, y=60, width=70, height=30)
+        def only_numbers(char):
+            return char.isdigit()
 
-        GButton_585 = tk.Button(moveOldWindow)
-        GButton_585["bg"] = "#f0f0f0"
+        validation = moveOldWindow.register(only_numbers)
+
+        yearEntry = tk.Entry(moveOldWindow, validate="key", validatecommand=(validation, '%S'))
+        yearEntry["borderwidth"] = "2px"
         ft = tkFont.Font(family='Times', size=13)
-        GButton_585["font"] = ft
-        GButton_585["fg"] = "#000000"
-        GButton_585["justify"] = "center"
-        GButton_585["text"] = "Move"
-        GButton_585.place(x=220, y=120, width=127, height=31)
-        # GButton_585["command"] = self.GButton_585_command
+        yearEntry["font"] = ft
+        yearEntry["fg"] = "#333333"
+        yearEntry["justify"] = "center"
+        yearEntry.place(x=305, y=60, width=70, height=30)
+
+        self.yearEntry = yearEntry
+
+        moveOldButton = tk.Button(moveOldWindow)
+        moveOldButton["bg"] = "#f0f0f0"
+        ft = tkFont.Font(family='Times', size=13)
+        moveOldButton["font"] = ft
+        moveOldButton["fg"] = "#000000"
+        moveOldButton["justify"] = "center"
+        moveOldButton["text"] = "Move"
+        moveOldButton.place(x=220, y=120, width=127, height=31)
+        moveOldButton["command"] = self.controller.moveOldButton
+
+    def displaySizeGraph(self, resultList):
+
+        labels = []
+        values = []
+
+        for result in resultList:
+            labels.append(result[0])
+            values.append(result[1])
+
+        fig = px.pie(values=values, names=labels,
+                     color_discrete_sequence=px.colors.sequential.RdBu)
+
+        fig.update_traces(textposition='inside',
+                          textinfo='percent+label+value',
+                          marker=dict(line=dict(color='#FFFFFF', width=2)),
+                          textfont_size=12)
+
+        fig.show()
 
     def main(self):
         self.mainloop()
-
-
-# class Page2(tk.Tk):
