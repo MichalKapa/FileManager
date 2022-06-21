@@ -122,7 +122,7 @@ class View(tk.Tk):
         moveButton["justify"] = "center"
         moveButton["text"] = "Move old"
         moveButton.place(x=295, y=360, width=230, height=40)
-        moveButton["command"] = self.dislpayMoveOld
+        moveButton["command"] = self.displayMoveOld
 
         compressButton = tk.Button(self)
         compressButton["bg"] = buttonBackground
@@ -274,7 +274,7 @@ class View(tk.Tk):
         master = self.master
         addFolderWindow = tk.Toplevel(master)
 
-        addFolderWindow.title("undefined")
+        addFolderWindow.title("Adding folder")
         # setting window size
         width = 560
         height = 240
@@ -345,7 +345,7 @@ class View(tk.Tk):
         master = self.master
         searchTextWindow = tk.Toplevel(master)
 
-        searchTextWindow.title("undefined")
+        searchTextWindow.title("Searching text")
         # setting window size
         width = 560
         height = 180
@@ -397,7 +397,7 @@ class View(tk.Tk):
 
         searchResultsWindow = tk.Toplevel(master)
 
-        searchResultsWindow.title("undefined")
+        searchResultsWindow.title("Search results")
         # setting window size
         width = 650
         height = 180
@@ -417,11 +417,11 @@ class View(tk.Tk):
         mylist.pack(side=LEFT, fill=X)
         scrollbar.config(command=mylist.yview)
 
-    def dislpayMoveOld(self):
+    def displayMoveOld(self):
         master = self.master
         moveOldWindow = tk.Toplevel(master)
 
-        moveOldWindow.title("undefined")
+        moveOldWindow.title("Moving old")
         # setting window size
         width = 560
         height = 180
