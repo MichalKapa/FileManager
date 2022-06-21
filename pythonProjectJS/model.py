@@ -86,10 +86,11 @@ class Model:
         for file in fileList:
             if not os.path.isdir(outputDirectoryPath + "/" + file):
                 for folder in folderNameList:
-                    if folder[1].lower() in file.lower():
-                        print(self.moveToDirectory(outputDirectoryPath + "/" + file,
-                                                   outputDirectoryPath + "/" + folder[0] + "/" + file))
-                        break
+                    if folder:
+                        if folder[1].lower() in file.lower():
+                            print(self.moveToDirectory(outputDirectoryPath + "/" + file,
+                                                       outputDirectoryPath + "/" + folder[0] + "/" + file))
+                            break
 
             fileList = self.getFilesInDirectory(outputDirectoryPath)
         for file in fileList:
@@ -166,9 +167,10 @@ class Model:
         with open(configurationPath + "/" + "extensionFolders.csv") as fileObject:
             readerObject = csv.reader(fileObject, delimiter=",")
             for line in readerObject:
-                if line[0] == directoryName:
-                    extensionList = line[1].split(";")
-                    break
+                if line:
+                    if line[0] == directoryName:
+                        extensionList = line[1].split(";")
+                        break
         return extensionList
 
     def createShortcuts(self, outputDirectoryPath):
